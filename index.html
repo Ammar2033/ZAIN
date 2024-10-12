@@ -69,27 +69,27 @@
 </head>
 <body>
   <div class="container" id="login-form">
-    <h2>Giriş Yap</h2>
+    <h2>الدخول</h2>
     <form>
-      <input type="email" id="login-email" placeholder="E-posta Adresiniz" required>
-      <input type="password" id="login-password" placeholder="Şifreniz" required>
-      <button type="submit" onclick="login()">Giriş</button>
-      <button type="button" onclick="loginWithGoogle()">Google ile Giriş Yap</button>
+      <input type="email" id="login-email" placeholder="ادخل البريد الإلكتروني" required>
+      <input type="password" id="login-password" placeholder="ادخل كلمة السر" required>
+      <button type="submit" onclick="login()">الدخول</button>
+      <button type="button" onclick="loginWithGoogle()">الدخول بحساب جوجل</button>
     </form>
     <div class="switch-form">
-      Hesabınız yok mu? <a href="#" onclick="showSignupForm()">Kaydolun</a>
+      ليس لدي حساب <a href="#" onclick="showSignupForm()">اشتراك</a>
     </div>
   </div>
 
   <div class="container" id="signup-form" style="display: none;">
-    <h2>Kayıt Ol</h2>
+    <h2>ليس لدي حساب</h2>
     <form>
-      <input type="email" id="signup-email" placeholder="E-posta Adresiniz" required>
-      <input type="password" id="signup-password" placeholder="Şifreniz" required>
-      <button type="submit" onclick="signup()">Kaydol</button>
+      <input type="email" id="signup-email" placeholder="ادخل البريد الإلكتروني" required>
+      <input type="password" id="signup-password" placeholder="ادخل كلمة السر" required>
+      <button type="submit" onclick="signup()">اشتراك</button>
     </form>
     <div class="switch-form">
-      Zaten hesabınız var mı? <a href="#" onclick="showLoginForm()">Giriş Yapın</a>
+      هل يوجد حساب؟ <a href="#" onclick="showLoginForm()">الدخول</a>
     </div>
   </div>
 
