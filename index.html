@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MAI</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://www.gstatic.com/firebasejs/9.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.7.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .switch-form {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .switch-form a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="login-form">
+    <h2>Giriş Yap</h2>
+    <form>
+      <input type="email" id="login-email" placeholder="E-posta Adresiniz" required>
+      <input type="password" id="login-password" placeholder="Şifreniz" required>
+      <button type="submit" onclick="login()">Giriş</button>
+      <button type="button" onclick="loginWithGoogle()">Google ile Giriş Yap</button>
+    </form>
+    <div class="switch-form">
+      Hesabınız yok mu? <a href="#" onclick="showSignupForm()">Kaydolun</a>
+    </div>
+  </div>
+
+  <div class="container" id="signup-form" style="display: none;">
+    <h2>Kayıt Ol</h2>
+    <form>
+      <input type="email" id="signup-email" placeholder="E-posta Adresiniz" required>
+      <input type="password" id="signup-password" placeholder="Şifreniz" required>
+      <button type="submit" onclick="signup()">Kaydol</button>
+    </form>
+    <div class="switch-form">
+      Zaten hesabınız var mı? <a href="#" onclick="showLoginForm()">Giriş Yapın</a>
+    </div>
+  </div>
+
+  <script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCvPeAnQ909_lUWoWPEdH2Ve8G-a1rWzLg",
+  authDomain: "mbaai-gc.firebaseapp.com",
+  databaseURL: "https://mbaai-gc-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "mbaai-gc",
+  storageBucket: "mbaai-gc.appspot.com",
+  messagingSenderId: "128127209791",
+  appId: "1:128127209791:web:f0042b7e92f0ee1067438a",
+  measurementId: "G-WJE2MTY7Y8"
+};
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function showLoginForm() {
+      document.getElementById('login-form').style.display = 'block';
+      document.getElementById('signup-form').style.display = 'none';
+    }
+
+    function showSignupForm() {
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('signup-form').style.display = 'block';
+    }
+    function generateRandomToken() {
+  // 32 karakterlik rastgele bir token oluşturun
+  const randomBytes = new Uint8Array(16);
+  window.crypto.getRandomValues(randomBytes);
+  return Array.from(randomBytes, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+async function signup() {
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+  const token = generateRandomToken();
+  try {
+    // Firebase Authentication kullanarak yeni bir kullanıcı oluştur
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    console.log('Yeni kullanıcı oluşturuldu:', user.uid);
+
+    // Kullanıcı kaydını Firebase Realtime Database'e kaydet
+    const database = firebase.database();
+    const usersRef = database.ref('users');
+    await usersRef.child(user.uid).set({
+      email: email
+    });
+
+    // Yeni kaydedilen kullanıcıyla giriş yap
+    await auth.signInWithEmailAndPassword(email, password); 
+    localStorage.setItem(`token-${user.uid}`, token); 
+    // Kullanıcıyı chat.html'ye yönlendir
+    window.location.href = `chat.html?userId=${user.uid}&token=${token}`; 
+
+  } catch (error) {
+    console.error('Kayıt hatası:', error);
+    // Hata mesajını kullanıcıya göster
+    alert('Kayıt olurken bir hata oluştu. Lütfen tekrar deneyin.');
+  }
+}
+
+async function login() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const token = generateRandomToken();
+
+  try {
+    // Firebase Authentication kullanarak kullanıcı girişi yap
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    console.log('Kullanıcı giriş yaptı:', user.uid);
+    localStorage.setItem(`token-${user.uid}`, token); 
+    // Kullanıcıyı chat.html'ye yönlendir
+    window.location.href = `chat.html?userId=${user.uid}&token=${token}`; 
+  } catch (error) {
+    console.error('Giriş hatası:', error);
+    // Hata mesajını kullanıcıya göster
+    alert('Kullanıcı adı veya şifre hatalı!');
+  }
+}
+
+async function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+
+        // Rastgele token oluştur
+        const token = generateRandomToken();
+
+        // Token'ı localStorage'a kaydet
+        localStorage.setItem(`token-${user.uid}`, token);
+
+        // Kullanıcıyı chat.html'ye yönlendir, token'ı da URL'ye ekleyin
+        window.location.href = `chat.html?userId=${user.uid}&token=${token}`;
+      } catch (error) {
+        console.error('Google girişi hatası:', error);
+        // Hata mesajını kullanıcıya göster
+      }
+    }
+
+  </script>
+</body>
+</html>
