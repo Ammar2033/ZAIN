@@ -1,9 +1,6 @@
 <!DOCTYPE html>
-
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/cs.min.js"></script> <!-- C# için -->
@@ -11,7 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/csharp.min.js"></script> <!-- C# için -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/python.min.js"></script>
   <script>hljs.highlightAll();</script>
-  <title>Zain-Lab</title>
+  <title>Chat with Zain-Lab</title>
   <style>
 /* Genel Stil Ayarları */
 
@@ -336,6 +333,71 @@ button {
   transition: all 0.3s ease; /* Tüm öğelere geçiş efekti ekleyin */
 }
 
+#popup {
+  position: fixed; /* Sayfaya göre sabit konum */
+  top: 0;        
+  left: 0;       
+  width: 100%;    
+  height: 100%;  /* Genişlik %70 - İstediğiniz değere ayarlayın */
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 20px; 
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000; 
+  display: none; 
+  overflow: hidden;
+  display: none;
+  flex-direction: ro; /* Öğeleri dikey olarak düzenleyin */
+  align-items: center;    /* Öğeleri yatay olarak ortala */
+}
+
+#popup-content {
+  position: relative; 
+  text-align: center;
+  height: 100%;       
+  display: flex;             
+  flex-direction: column;  
+  justify-content: flex-start; /* Butonları alta hizala */
+  width: 100%;           /* Görselin genişliğini ayarlayın */
+  margin-bottom: 20px;   /* Görsel ile butonlar arasına boşluk ekleyin */
+}
+
+
+#popup-close {
+  position: absolute;
+  top: 10px;
+  right: 30px;
+  cursor: pointer;
+}
+
+#popup-image {
+  position: static;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 60%; /* Görselin yüksekliğini artırın */
+  margin: 10px auto; /* Görsele üstten boşluk ekleyin ve ortala */
+  border-radius: 15px;
+}
+
+
+#prev-button, 
+#next-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  display: inline-block;      /* Butonları yan yana sığdır */
+  margin-bottom: 10px;
+  margin: 0 5px;     
+}
+
+#prev-button {
+  margin-right: 10px;
+}
 
 .bot-message::before {
   content: '';
@@ -349,6 +411,7 @@ button {
 }
 
 #main-chat-header {
+  opacity: 0;
   background-color: var(--container-background-color);
   padding: 10px 20px;
   border-bottom: 1px solid #ddd;
@@ -386,9 +449,11 @@ button {
 
 .dropdown-icon {
   margin-left: 5px;
+  opacity: 0;
 }
 
 #model-selector-dropdown {
+  opacity: 0;
   position: absolute;
   top: 100%;
   left: 0;
@@ -404,6 +469,7 @@ button {
 }
 
 .model-option {
+  opacity: 0;
   display: flex;
   align-items: center;
   padding: 8px;
@@ -413,24 +479,29 @@ button {
 }
 
 .model-option:hover {
+  opacity: 0;
   background-color: #f5f5f5;
 }
 
 .model-option.selected {
+  opacity: 0;
   background-color: #e9ecef;
 }
 
 .model-icon {
+  opacity: 0;
   margin-right: 10px;
   font-size: 1.2em;
 }
 
 .model-description {
+  opacity: 0;
   flex-grow: 1;
   font-size: 14px; /* Açıklama yazı tipi boyutu */
 }
 
 .upgrade-button {
+  opacity: 0;
   background-color: #4CAF50; /* Yükselt butonu rengi */
   color: white;
   border: none;
@@ -441,10 +512,12 @@ button {
 }
 
 .upgrade-button:hover {
+  opacity: 0;
   background-color: #45a049; /* Yükselt butonu hover rengi */
 }
 
 .selected-icon {
+  opacity: 0;
   margin-left: 10px;
   font-size: 1.2em;
 }
@@ -605,6 +678,14 @@ input:checked + .slider:before {
   </style>
 </head>
 <body>
+  <div id="popup">
+    <div id="popup-content">
+      <button id="popup-close">Kapat</button>
+      <img src="popup1.png" alt="" srcset="" id="popup-image">
+      <button id="prev-button">Geri</button> <button id="next-button">İleri</button>
+    </div>
+    
+  </div>
   <div id="chat-container">
     <div id="sidebar">
       <div id="sidebar-top">
@@ -614,9 +695,29 @@ input:checked + .slider:before {
       <button id="new-conversation-btn">محادثة جديدة</button>
       <button id="theme-toggle">تصميم أسود</button>
       <button id="logout-button">الخروج</button>
+      <button id="profile-button">الملف الشخصي</button>
       <div id="conversation-list"></div>
     </div>
     <div id="main-chat">
+      <div id="main-chat-header">
+        <div id="model-selector-container">
+          <button id="selected-model-button">MAI <span class="dropdown-icon">▼</span></button>
+          <div id="model-selector-dropdown" style="display: none;">
+            <div class="model-option" data-model="MAI Ultra">
+              <span class="model-icon">✨</span> MAI Ultra 1.0
+              <span class="model-description">En zeki ve en gelişmiş modelimiz</span>
+              <button class="upgrade-button">Yükselt</button>
+            </div>
+            <div class="model-option selected" data-model="MAI Plus">
+              <span class="model-icon">⚛️</span> MAI Plus 1.0
+              <span class="model-description">Daha hızlı ve Daha Zeki</span>
+              <span class="selected-icon">✔️</span>
+            </div>
+            <div class="model-option" data-model="MAI"> <span class="model-icon">🤖</span> MAI 1.0
+              <span class="model-description">Günlük görevler için ideal ve güçlü</span> </div>
+          </div>
+        </div>
+      </div>
       <div id="chat-history-container">
         <video autoplay  id="background-video">
           <source src="intro.mp4" type="video/mp4">
@@ -679,12 +780,20 @@ function enforceLandscapeMode() {
     const conversationList = document.getElementById('conversation-list');
     const loader = document.getElementById('loader');
     const themeToggleBtn = document.getElementById('theme-toggle');
+    const popup = document.getElementById('popup');
+    const popupClose = document.getElementById('popup-close');
+    const popupImage = document.getElementById('popup-image');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
     const savedTheme = localStorage.getItem('theme');
     const logoutButton = document.getElementById('logout-button');
     const chatHistoryContainer = document.getElementById('chat-history-container');
     const backgroundVideo = document.getElementById('background-video');
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
+
+    const images = ['popup1.png', 'popup2.png', 'popup3.png']; // Görsel dosyalarının isimleri
+    let currentImageIndex = 0;
 
     let currentConversationId = null;
     let messageListener = null;
@@ -719,6 +828,30 @@ backgroundVideo.addEventListener('ended', () => {
   localStorage.setItem('introVideoPlayed', 'true');
   chatHistoryContainer.classList.add('intro-played'); // intro-played sınıfını ekle
 });
+
+        // Girilen metnin dilini kontrol eden fonksiyon
+        function detectLanguageDirection(text) {
+            // Arapça karakter aralığı: Unicode 0600 - 06FF
+            const arabicPattern = /[\u0600-\u06FF]/;
+
+            if (arabicPattern.test(text)) {
+                // Arapça karakterler varsa sağdan sola yazılsın
+                userInput.setAttribute("dir", "rtl");
+                userInput.style.textAlign = "right";
+            } else {
+                // Diğer durumlarda soldan sağa
+                userInput.setAttribute("dir", "ltr");
+                userInput.style.textAlign = "left";
+            }
+        }
+
+        // Kullanıcı her yeni karakter girdiğinde kontrol edilir
+        userInput.addEventListener("input", function() {
+            detectLanguageDirection(userInput.value);
+        });
+
+        // Placeholder için dil kontrolü yapalım
+        detectLanguageDirection(userInput.placeholder);
 
 // Sayfa yüklendiğinde localStorage'ı kontrol et
 if (localStorage.getItem('introVideoPlayed') === 'true') {
@@ -796,8 +929,24 @@ modelOptions.forEach(option => {
         });
       });
 
+  if (!localStorage.getItem('popupShown')) {
+      popup.style.display = 'block';
+      localStorage.setItem('popupShown', 'true');
+    }
+
+    popupClose.addEventListener('click', () => {
+  popup.style.display = 'none';
 });
 
+prevButton.addEventListener('click', () => {
+  currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+  popupImage.src = images[currentImageIndex];
+});
+
+nextButton.addEventListener('click', () => {
+  currentImageIndex = (currentImageIndex + 1) % images.length;
+  popupImage.src = images[currentImageIndex];
+});
 
   // Satır sayısını 10 ile sınırla
   if (currentLine > 10) {
@@ -1021,13 +1170,13 @@ form.addEventListener('submit', async (event) => {
 });
 
     newConversationBtn.addEventListener('click', async () => {
-      const name = prompt("Konuşma Adını Girin:");
+      const name = prompt("أدخل اسم المحادثة الجديد:");
       if (name) {
         await createNewConversation(name);
       }
     });
 
-    async function createNewConversation(name = 'Yeni Konuşma') {
+    async function createNewConversation(name = 'محادثة جديدة') {
   const newConversationRef = push(ref(database, `users/${currentUserId}/conversations`));
   currentConversationId = newConversationRef.key;
 
@@ -1075,10 +1224,10 @@ form.addEventListener('submit', async (event) => {
 
               const editButton = document.createElement('button');
               editButton.classList.add('edit-conversation-button');
-              editButton.innerText = 'Düzenle';
+              editButton.innerText = 'تعديل';
               editButton.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const newName = prompt('Yeni konuşma adını girin:', conversationElement.innerText);
+                const newName = prompt('أدخل اسم المحادثة الجديد:', conversationElement.innerText);
                 if (newName) {
                   update(ref(database, `conversations/${conversationId}`), {
                     name: newName
@@ -1171,7 +1320,7 @@ const userMessageElement = document.createElement('div');
 
         const botMessageElement = document.createElement('div');
         botMessageElement.classList.add('bot-message');
-        botMessageElement.innerHTML = `${formattedBotMessage} <button class="copy-button" onclick="copyToClipboard('${message.botMessage}')">Kopyala</button>`;
+        botMessageElement.innerHTML = `${formattedBotMessage} <button class="copy-button" onclick="copyToClipboard('${message.botMessage}')">نسخ</button>`;
         chatHistory.appendChild(botMessageElement);
 
         const userCodeElement = userMessageElement.querySelector('code');
@@ -1214,17 +1363,13 @@ const userMessageElement = document.createElement('div');
     themeToggleBtn.addEventListener('click', () => {
   document.body.classList.toggle('dark-theme');
   currentTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
-  themeToggleBtn.innerText = currentTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod';
+  themeToggleBtn.innerText = currentTheme === 'dark' ? 'تصميم أبيض' : 'تصميم أسود';
   chatHistoryContainer.style.backgroundImage = `var(--mai-logo)`;
   // Dark Mode tercihini Local Storage'a kaydet
   localStorage.setItem('theme', currentTheme);
 });
 
-if (savedTheme) {
-  document.body.classList.add(savedTheme);
-  currentTheme = savedTheme;
-  themeToggleBtn.innerText = currentTheme === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod';
-}
+
 
     function saveThemeToFirebase(theme) {
       if (!currentConversationId) return;

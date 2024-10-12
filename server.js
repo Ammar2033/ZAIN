@@ -5,7 +5,6 @@ const dotenv = require('dotenv').config();
 const admin = require('firebase-admin');
 const path = require('path');
 const fs = require('fs');
-const cors = require('cors');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } = require('firebase-admin/auth');
 
@@ -15,11 +14,10 @@ const serviceAccount = require(path.join(__dirname, 'serviceAccountKey.json'));
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://mbaai-gc-default-rtdb.europe-west1.firebasedatabase.app'
+  databaseURL: 'https://ava-vitamin-default-rtdb.europe-west1.firebasedatabase.app'
 });
 
 const app = express();
-app.use(cors());
 const port = process.env.PORT || 3000;
 app.use(express.json());
 const MODEL_NAME = "gemini-1.5-pro";
@@ -148,9 +146,7 @@ app.post('/link-preview', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/html; charset=UTF-8' });
   res.sendFile(__dirname + '/index.html');
-  
 });
 
 app.get('/loader.gif', (req, res) => {
