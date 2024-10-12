@@ -336,71 +336,6 @@ button {
   transition: all 0.3s ease; /* Tüm öğelere geçiş efekti ekleyin */
 }
 
-#popup {
-  position: fixed; /* Sayfaya göre sabit konum */
-  top: 0;        
-  left: 0;       
-  width: 100%;    
-  height: 100%;  /* Genişlik %70 - İstediğiniz değere ayarlayın */
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 20px; 
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  z-index: 1000; 
-  display: none; 
-  overflow: hidden;
-  display: none;
-  flex-direction: ro; /* Öğeleri dikey olarak düzenleyin */
-  align-items: center;    /* Öğeleri yatay olarak ortala */
-}
-
-#popup-content {
-  position: relative; 
-  text-align: center;
-  height: 100%;       
-  display: flex;             
-  flex-direction: column;  
-  justify-content: flex-start; /* Butonları alta hizala */
-  width: 100%;           /* Görselin genişliğini ayarlayın */
-  margin-bottom: 20px;   /* Görsel ile butonlar arasına boşluk ekleyin */
-}
-
-
-#popup-close {
-  position: absolute;
-  top: 10px;
-  right: 30px;
-  cursor: pointer;
-}
-
-#popup-image {
-  position: static;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 60%; /* Görselin yüksekliğini artırın */
-  margin: 10px auto; /* Görsele üstten boşluk ekleyin ve ortala */
-  border-radius: 15px;
-}
-
-
-#prev-button, 
-#next-button {
-  margin-top: 10px;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: var(--primary-color);
-  color: white;
-  cursor: pointer;
-  display: inline-block;      /* Butonları yan yana sığdır */
-  margin-bottom: 10px;
-  margin: 0 5px;     
-}
-
-#prev-button {
-  margin-right: 10px;
-}
 
 .bot-message::before {
   content: '';
@@ -670,14 +605,6 @@ input:checked + .slider:before {
   </style>
 </head>
 <body>
-  <div id="popup">
-    <div id="popup-content">
-      <button id="popup-close">Kapat</button>
-      <img src="popup1.png" alt="" srcset="" id="popup-image">
-      <button id="prev-button">Geri</button> <button id="next-button">İleri</button>
-    </div>
-    
-  </div>
   <div id="chat-container">
     <div id="sidebar">
       <div id="sidebar-top">
@@ -772,20 +699,12 @@ function enforceLandscapeMode() {
     const conversationList = document.getElementById('conversation-list');
     const loader = document.getElementById('loader');
     const themeToggleBtn = document.getElementById('theme-toggle');
-    const popup = document.getElementById('popup');
-    const popupClose = document.getElementById('popup-close');
-    const popupImage = document.getElementById('popup-image');
-    const prevButton = document.getElementById('prev-button');
-    const nextButton = document.getElementById('next-button');
     const savedTheme = localStorage.getItem('theme');
     const logoutButton = document.getElementById('logout-button');
     const chatHistoryContainer = document.getElementById('chat-history-container');
     const backgroundVideo = document.getElementById('background-video');
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
-
-    const images = ['popup1.png', 'popup2.png', 'popup3.png']; // Görsel dosyalarının isimleri
-    let currentImageIndex = 0;
 
     let currentConversationId = null;
     let messageListener = null;
@@ -897,24 +816,8 @@ modelOptions.forEach(option => {
         });
       });
 
-  if (!localStorage.getItem('popupShown')) {
-      popup.style.display = 'block';
-      localStorage.setItem('popupShown', 'true');
-    }
-
-    popupClose.addEventListener('click', () => {
-  popup.style.display = 'none';
 });
 
-prevButton.addEventListener('click', () => {
-  currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
-  popupImage.src = images[currentImageIndex];
-});
-
-nextButton.addEventListener('click', () => {
-  currentImageIndex = (currentImageIndex + 1) % images.length;
-  popupImage.src = images[currentImageIndex];
-});
 
   // Satır sayısını 10 ile sınırla
   if (currentLine > 10) {
