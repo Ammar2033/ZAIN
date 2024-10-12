@@ -2,7 +2,7 @@
   "name": "ava_ai",
   "version": "1.0.0",
   "engines": {
-    "node": ">=20.15.1 <20.12.2"
+    "node": ">=18.0.0 <21.4.0"
   },
   "description": "",
   "main": "index.js",
